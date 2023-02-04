@@ -1,25 +1,62 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./Timer.css";
 
-function App() {
+const Timer = () => {
+  const [duration, setDuration] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    let interval = null;
+    if (isActive) {
+      interval = setInterval(() => {
+        setDuration((duration) => {
+          if (duration <= 0) {
+            clearInterval(interval);
+            setIsActive(false);
+            alert("Time's up!");
+            return 0;
+          }
+          return duration - 1;
+        });
+      }, 1000);
+    } else if (!isActive && duration !== 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isActive, duration]);
+
+  const handleStart = () => {
+    setIsActive(!isActive);
+  };
+
+  const handleReset = () => {
+    setDuration(0);
+    setIsActive(false);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="timer">
+      <input
+        type="number"
+        value={duration}
+        onChange={(event) => setDuration(event.target.value)}
+      />
+      <div className="controls">
+        {isActive ? (
+          <button className="button button-pause" onClick={handleStart}>
+            Pause
+          </button>
+        ) : (
+          <button className="button button-start" onClick={handleStart}>
+            Start
+          </button>
+        )}
+        <button className="button button-reset" onClick={handleReset}>
+          Reset
+        </button>
+      </div>
     </div>
   );
-}
+};
 
-export default App;
+export default Timer;
